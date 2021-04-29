@@ -1,0 +1,64 @@
+version: "2"
+services:
+   namenode:
+      image: ali/hadoop
+      hostname: namenode1
+      working_dir: /opt/hadoop/hadoop-2.10.1
+      volumes: 
+         - ./logs/:/opt/hadoop/hadoop-2.10.1/logs/
+         - ./hadoop/config/:/opt/hadoop/hadoop-2.10.1/etc/hadoop
+      command: >
+         bash -c "bin/hdfs namenode -format
+         && bin/hdfs namenode"
+      ports:
+         - 50070:50070
+   datanode:
+      image: ali/hadoop
+      hostname: datanode1
+      depends_on: 
+         - namenode
+      working_dir: /opt/hadoop/hadoop-2.10.1
+      volumes: 
+         - ./logs/:/opt/hadoop/hadoop-2.10.1/logs/
+         - ./hadoop/config/:/opt/hadoop/hadoop-2.10.1/etc/hadoop
+      command: ["bash", "bin/hdfs", "datanode"]
+   zoo1:
+      image: zookeeper
+      restart: always
+      hostname: zoo1
+      ports:
+         - 2181:2181
+      depends_on: 
+         - namenode
+         - datanode
+      environment:
+         ZOO_MY_ID: 1
+         ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
+         ZOO_LOG_DIR: /logs
+         ZOO_DATA_DIR: /data
+         ZOO_DATA_LOG_DIR: /datalog
+      volumes: 
+         - ./logs/:/logs
+         - ./zookeeper/data/:/data
+         - ./zookeeper/datalog/:/datalog
+   accumulo:
+      image: ali/accumulo
+      restart: always
+      working_dir: /opt/accumulo/accumulo-1.10.1/
+      depends_on: 
+         - namenode
+         - datanode
+         - zoo1
+      hostname: accumulo
+      command: ["sh","-c","tail","-f","/dev/null"]
+      environment: 
+         INSTANCE_NAME: accumulotest
+         USERNAME: root
+         PASSWORD: password
+      ports:
+         - 9995:9995
+      volumes: 
+         - ./logs/:/logs
+         - ./accumulo/config/:/opt/accumulo/accumulo-1.10.1/conf/
+
+
