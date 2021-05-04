@@ -43,14 +43,15 @@ services:
          - ./zookeeper/datalog/:/datalog
    accumulo:
       image: ali/accumulo
+      stdin_open: true
+      tty: true
       restart: always
       working_dir: /opt/accumulo/accumulo-1.10.1/
-      depends_on: 
+      depends_on:
          - namenode
          - datanode
          - zoo1
       hostname: accumulo
-      command: ["sh","-c","tail","-f","/dev/null"]
       environment: 
          INSTANCE_NAME: accumulotest
          USERNAME: root

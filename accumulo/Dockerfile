@@ -11,3 +11,4 @@ RUN curl https://downloads.apache.org/zookeeper/zookeeper-3.7.0/apache-zookeeper
 RUN tar -zxvf accumulo-1.10.1-bin.tar.gz
 RUN tar -zxvf apache-zookeeper-3.7.0-bin.tar.gz && chmod 777 -R apache-zookeeper-3.7.0-bin
 RUN chmod 777 -R accumulo-1.10.1
+ENTRYPOINT [ "/bin/bash" ]
